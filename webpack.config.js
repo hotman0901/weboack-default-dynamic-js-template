@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var extractPlugin = new ExtractTextPlugin({
     filename: 'main.css'
 });
-
+// 告知要把js抽離的檔案
 const VENDER_LIBS = [
     "jquery"
 ]
@@ -75,7 +75,9 @@ module.exports = {
         extractPlugin,
         // html 模板參考
         new HtmlWebpackPlugin({
-            template: 'src/index.html'
+            template: 'src/index.html',
+            // 加上這一段讓CommonsChunkPlugin不會產稱error
+            chunksSortMode: 'dependency'
         }),
         // 要將jquery include近來
         new webpack.ProvidePlugin({
@@ -83,9 +85,10 @@ module.exports = {
             $: 'jquery',
             jquery: 'jquery'
         }),
-         new webpack.optimize.CommonsChunkPlugin({
+        new webpack.optimize.CommonsChunkPlugin({
             // mainfest 是讓瀏覽器不要cach的做法
-            names: ['vendor','manifest']
+            names: ['vendor', 'manifest'],
+
         }),
 
 
