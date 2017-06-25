@@ -1,27 +1,37 @@
 var webpack = require('webpack');
 var path = require('path');
+// 抽離css個別檔案
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+// 自動產生 html 檔，並包含 bundle 後的檔案路徑 
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-// 告知要把css抽離的檔案
-var extractPlugin = new ExtractTextPlugin({
-    filename: 'main.css'
-});
+// 能夠將原來的檔案，跟 bundle 後的檔案，是能跟對照的 mapping 檔
+var ManifestPlugin = require('webpack-manifest-plugin');
+// 清除dist資料夾
+var CleanWebpackPlugin = require('clean-webpack-plugin');
+
+
+// 告知要把css抽離的檔案(這個替換寫在plugin內)
+// var extractPlugin = new ExtractTextPlugin({
+//     filename: 'main.css'
+// });
 // 告知要把js抽離的檔案
+// 這是不會異動到js，所以把他綁在一起
 const VENDER_LIBS = [
-    "jquery"
+    "jquery", "bootstrap"
 ]
 
 module.exports = {
     // entry: './src/js/app.js',
     entry: {
-        bundle: './src/js/app.js',
-        // 分解js
+        // 前面app這個key會是後面[name]的替換
+        app: './src/js/app.js',
+        // 不會異動到的檔案放在vender.js
         vendor: VENDER_LIBS
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
         // filename: 'bundle.js',
-        filename: '[name].[chunkhash]js'
+        filename: '[name].[chunkhash].js'
         // vendor: VENDER_LIBS
         // publicPath: '/dist'
     },
@@ -42,9 +52,10 @@ module.exports = {
                     use: ['css-loader']
                 })
             },
+            // 處理scss
             {
                 test: /\.scss$/,
-                use: extractPlugin.extract({
+                use: ExtractTextPlugin.extract({
                     use: ['css-loader', 'sass-loader']
                 })
             },
@@ -59,7 +70,7 @@ module.exports = {
                 use: [{
                         loader: 'file-loader',
                         options: {
-                            name: '[name].[ext]',
+                            name: '[name]-[hash].[ext]',
                             outputPath: 'img/',
                             // 不曉得為什麼加上這個反而會多一個img路徑
                             // publicPath: 'img/'
@@ -68,11 +79,17 @@ module.exports = {
                     },
                     'image-webpack-loader'
                 ]
+            },
+            {
+                test: /\.json$/,
+                use: [{
+                    loader: 'json-loader'
+                }]
             }
         ]
     },
     plugins: [
-        extractPlugin,
+        // extractPlugin,
         // html 模板參考
         new HtmlWebpackPlugin({
             template: 'src/index.html',
@@ -87,9 +104,33 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             // mainfest 是讓瀏覽器不要cach的做法
+            // 因為webpack有自己的runtime code
+            // 如果單獨寫在vender會每次build檔案的時候，都會改變
+            // 所以輸出一個manifest的專門放runtime code
             names: ['vendor', 'manifest'],
 
         }),
+        // 壓縮js檔，但測試沒有這個也會自動壓縮
+        new webpack.optimize.UglifyJsPlugin({
+            compressor: {
+                warnings: false,
+            },
+        }),
+        // 打包css用
+        new ExtractTextPlugin({
+            filename: "[name].[hash].css",
+            allChunks: true,
+        }),
+        // 產生對照表是一個json
+        new ManifestPlugin({
+            fileName: 'custom-manifest.json'
+        }),
+        // 清除dist資料夾，顯示訊息打開
+        new CleanWebpackPlugin(['dist'], {
+            "verbose": true,
+            // 可以增加判斷說不要刪掉哪個檔案
+            // "exclude": ['05ef02be5a02714eab77.vendor.js']
+        })
 
 
     ]
