@@ -49,14 +49,14 @@ module.exports = {
                 // use: ['style-loader', 'css-loader']
                 // 改另外產生css檔案作法
                 use: ExtractTextPlugin.extract({
-                    use: ['css-loader']
+                    use: ['css-loader', 'postcss-loader', ]
                 })
             },
             // 處理scss
             {
                 test: /\.scss$/,
                 use: ExtractTextPlugin.extract({
-                    use: ['css-loader', 'sass-loader']
+                    use: ['css-loader', 'postcss-loader', 'sass-loader']
                 })
             },
             {
@@ -130,7 +130,22 @@ module.exports = {
             "verbose": true,
             // 可以增加判斷說不要刪掉哪個檔案
             // "exclude": ['05ef02be5a02714eab77.vendor.js']
-        })
+        }),
+        // 這些設定改在postcss.config.js
+        // new webpack.LoaderOptionsPlugin({
+        //     options: {
+        //         postcss: [
+        //             require('autoprefixer')({
+        //                 browsers: [
+        //                     'last 3 version',
+        //                     'ie >= 9',
+        //                     'ios 8',
+        //                     'Chrome >= 49', 'Firefox >= 49',
+        //                 ]
+        //             })
+        //         ]
+        //     }
+        // })
 
 
     ]
