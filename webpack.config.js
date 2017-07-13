@@ -31,7 +31,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         // filename: 'bundle.js',
-        filename: '[name].[chunkhash].js',
+        filename: '[name].[chunkhash].js'
         // vendor: VENDER_LIBS
         // publicPath: '/dist'
     },
@@ -45,6 +45,7 @@ module.exports = {
                     }
                 }]
             }, {
+                // css 壓縮是透過指令 webpack -p 的-p
                 test: /\.css$/,
                 // use: ['style-loader', 'css-loader']
                 // 改另外產生css檔案作法
@@ -54,6 +55,7 @@ module.exports = {
             },
             // 處理scss
             {
+                // css 壓縮是透過指令 webpack -p 的-p
                 test: /\.scss$/,
                 use: ExtractTextPlugin.extract({
                     use: ['css-loader', 'postcss-loader', 'sass-loader']
@@ -74,6 +76,7 @@ module.exports = {
                             outputPath: 'img/',
                             // 不曉得為什麼加上這個反而會多一個img路徑
                             // publicPath: 'img/'
+                            limit: 10000 /* 小於 10kB 的圖片轉成 base64 */
                         }
 
                     },
