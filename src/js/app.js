@@ -2,5 +2,5 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 import '../scss/main.scss';
 
 $('#aa').click(()=>{
-    console.log(44434);
+    System.import('./hello.js');
 })

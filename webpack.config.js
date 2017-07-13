@@ -31,7 +31,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         // filename: 'bundle.js',
-        filename: '[name].[chunkhash].js'
+        filename: '[name].[chunkhash].js',
         // vendor: VENDER_LIBS
         // publicPath: '/dist'
     },
